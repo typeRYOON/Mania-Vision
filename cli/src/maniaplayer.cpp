@@ -11,7 +11,7 @@
 //
 namespace maniaplayer
 {
-    std::unordered_map<std::thread::id, uint32_t> thread_shifts;
+    std::unordered_map<std::thread::id, int32_t> thread_shifts;
     std::atomic<bool>     terminate( false );
     std::mutex mtx;
     std::condition_variable cv;
