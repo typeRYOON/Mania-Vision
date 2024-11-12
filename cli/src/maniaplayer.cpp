@@ -45,8 +45,7 @@ namespace maniaplayer
         if ( start_delay ) { std::this_thread::sleep_until( expected ); }
 
         // Initialize unique shift for current thread :
-        const std::thread::id tid = std::this_thread::get_id();
-        auto [it, _]              = shifts.emplace( tid, 0 );
+        auto [it, _] = shifts.emplace( std::this_thread::get_id(), 0 );
 
         for ( const auto& hit : hit_map )
         {   // User terminated early :
@@ -70,7 +69,7 @@ namespace maniaplayer
         // Thread clean up :
         keybd_event( virtual_key, 0, KEYEVENTF_KEYUP, 0 );
         std::lock_guard<std::mutex> lock( mtx );
-        --active_threads;
+        active_threads--;
         cv.notify_all();
     }
 
