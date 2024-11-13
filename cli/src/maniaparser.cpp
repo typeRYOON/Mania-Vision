@@ -22,9 +22,10 @@ namespace maniaparser
     // Parse mania file's frames, get column timeline, convert frame time to ms time.  - -
     void parse_hitframes( HitMap& hm, std::ifstream& instream )
     {
-        uint32_t time = 1, line_data;
-        std::string line;
         std::array<uint32_t, 4> start_times = { 0, 0, 0, 0 };
+        std::string             line;
+        uint32_t                line_data;
+        uint32_t                time = 1;
 
         // Timeline is an array that has each column's press start and end time as a pair.
         std::array<std::vector<std::pair<uint32_t, uint32_t>>, 4> timeline;
@@ -38,27 +39,27 @@ namespace maniaparser
             try { line_data = std::stoi( line ); }
             catch ( ... ) {
                 instream.close();
-                hm.err = "Bad line: "
+                hm.err = "Bad line ("
                          + std::to_string( time )
-                         + " \"" + line + "\".";
+                         + "): \"" + line + "\".";
                 return;
             }
 
             // Check each column bit, get start/end time of each press :
-            for ( uint8_t i = 1, j = 0; i != 16; i <<= 1, j++ )
+            for ( uint8_t i = 0, column_bit = 1; i < 4; ++i, column_bit <<= 1 )
             {   // In press :
-                if ( line_data & i )
+                if ( line_data & column_bit )
                 {   // New press :
-                    if ( !start_times.at(j) ) { start_times[j] = time; }
+                    if ( !start_times.at(i) ) { start_times[i] = time; }
                 }
                 // No press :
                 else
                 {   // Released press :
-                    if ( start_times.at(j) ) {
-                        timeline[j].emplace_back(
-                            std::make_pair( start_times.at(j), time )
+                    if ( start_times.at(i) ) {
+                        timeline[i].emplace_back(
+                            std::make_pair( start_times.at(i), time )
                         );
-                        start_times[j] = 0;
+                        start_times[i] = 0;
                     }
                 }
             }
@@ -83,12 +84,13 @@ namespace maniaparser
             hm.hitmap[i].reserve( timeline.at(i).size() );
         }
 
-        uint32_t earliest = UINT32_MAX;
-        uint32_t htime_f, dtime_f, htime_ms, dtime_ms, carry_ms, n;
+        // Frame to ms conversion variables :
         const uint32_t frame_ms  = 1000 / hm.fps;
         const uint32_t remain_ms = 1000 % hm.fps;
+        uint32_t htime_f, dtime_f, htime_ms, dtime_ms, carry_ms, n;
 
         // Stage 1.5b - Create start delays :
+        uint32_t earliest = UINT32_MAX;
         for ( uint8_t i = 0; i < 4; ++i ) {
             if ( timeline.at(i).at(0).first < earliest ) {
                 earliest = timeline.at(i).at(0).first;
@@ -102,8 +104,8 @@ namespace maniaparser
         // Stage 2 - Transform hold times and release times to ms using fps :
         for ( uint8_t i = 0; i < 4; ++i )
         {   // Reset carry for column, iterate to n-1 element:
-            carry_ms = 0;
             n = timeline.at(i).size() - 1;
+            carry_ms = 0;
 
             for ( uint32_t j = 0; j < n; ++j )
             {   // Frame duration calculations :
@@ -133,10 +135,16 @@ namespace maniaparser
     // Open file and retrieve header info, continue onto parse_hitframes func :: - -   - -
     HitMap hitmap_from_file( const std::string& file_path )
     {
-        std::ifstream file( file_path );
         HitMap hm( file_path );
 
+        // Argument check :
+        if ( file_path.empty() ) {
+            hm.err = "Must pass a mania file argument.";
+            return hm;
+        }
+
         // Check if file exists :
+        std::ifstream file( file_path );
         if ( !file.is_open() ) {
             hm.err = file_path + " does not exist.";
             return hm;

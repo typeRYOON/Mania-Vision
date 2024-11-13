@@ -16,15 +16,14 @@
 #include "maniaplayer.h"
 
 // Program entrypoint :: - -                                                           - -
-int32_t main( int32_t argc, char* argv[] )
-{   // Needs a file command line argument :
-    if ( argc < 2 ) { 
-        std::cerr << "\n > Error: Must pass a mania file argument."  << std::endl;
-        return -1;
-    }
-
+int32_t main( const int32_t argc, const char** argv )
+{
     // Create HitMap object from passed file :
-    const HitMap hit_map = maniaparser::hitmap_from_file( argv[1] );
+    const HitMap hit_map = maniaparser::hitmap_from_file(
+        ( argc < 2 ) ? "" : argv[1]
+    );
+
+    // Check returned error :
     if ( !hit_map.err.empty() ) {
         std::cerr << "\n > Error: " << hit_map.err << std::endl;
         return -1;

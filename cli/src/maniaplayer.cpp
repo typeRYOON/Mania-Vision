@@ -25,9 +25,9 @@
 namespace maniaplayer
 {   // Thread synchronization variables :: - -                                         - -
     std::unordered_map<std::thread::id, int32_t> shifts; // Shift applied to each thread.
+    std::condition_variable cv;                          // Thread condition blocker.
     std::atomic<bool>       terminate( false );          // User end condition.
     std::mutex              mtx;                         // Mutual exclusion helper.
-    std::condition_variable cv;                          // Thread condition blocker.
     uint8_t                 active_threads = 0;          // Organic end condition.
 
     // Thread key runner function, precisely play a given hit_map for a key :: - -     - -
@@ -84,6 +84,7 @@ namespace maniaplayer
         }
 
         // Launch threads :
+        std::cout << "\n > Starting hitmap execution.";
         std::vector<std::thread> threads;
         for ( uint8_t i = 0; i < 4; ++i )
         {
@@ -110,15 +111,22 @@ namespace maniaplayer
             if ( GetAsyncKeyState( 'J' ) & 0x8000 ) { terminate = true; }
             else if ( GetAsyncKeyState( '1' ) & 0x8000 ) {
                 for ( auto& [_, shift] : shifts ) { shift -= 3; }
+                std::cout << "\n > -3ms shift.";
             }
             else if ( GetAsyncKeyState( '2' ) & 0x8000 ) {
                 for ( auto& [_, shift] : shifts ) { shift += 3; }
+                std::cout << "\n > +3ms shift.";
             }
         }
+
+        //
+        if ( terminate ) { std::cout << "\n > User terminated early."     ; }
+        else             { std::cout << "\n > Threads finished execution."; }
 
         // Join back threads :
         for ( std::thread& thread : threads ) {
             if ( thread.joinable() ) { thread.join(); }
         }
+        std::cout << "\n > Joined all threads, exiting.\n";
     }
 }   // :: - -                                                                          - -

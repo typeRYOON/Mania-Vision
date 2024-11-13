@@ -1,5 +1,4 @@
 # For Mania-Vision project (cli version) :: - -                                        - -
-.PHONY: all setup run clean
 
 # Compiler related :: - -                                                              - -
 CXX      = g++
@@ -22,18 +21,16 @@ OBJECTS = $(O1) $(O2) $(O3)
 # Main build target :: - -                                                             - -
 ARGS   = test.txt
 BINDIR = bin
-TARGET = bin/mania-vision-cli.exe
+TARGET = $(BINDIR)/mania-vision-cli.exe
+
+.PHONY: all run clean setup
 
 # Rules :: - -                                                                         - -
-all: $(TARGET)
+all: setup $(TARGET)
 
 run: $(TARGET)
 	@clear
 	@$(TARGET) $(ARGS)
-
-setup:
-	@mkdir $(OBJDIR)
-	@mkdir $(BINDIR)
 
 clean:
 	@rm -f $(OBJECTS)
@@ -51,5 +48,10 @@ $(O2): $(S2)
 
 $(O3): $(S3)
 	@$(CXX) $(CXXFLAGS) -c $(S3) -o $(O3)
+
+setup:
+	@-mkdir $(OBJDIR) 2> NUL || true
+	@-mkdir $(BINDIR) 2> NUL || true
+	@rm -f NUL
 
 # :: - -                                                                               - -
