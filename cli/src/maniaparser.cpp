@@ -85,9 +85,11 @@ namespace maniaparser
         }
 
         // Frame to ms conversion variables :
-        const uint32_t frame_ms  = 1000 / hm.fps;
-        const uint32_t remain_ms = 1000 % hm.fps;
-        uint32_t htime_f, dtime_f, htime_ms, dtime_ms, carry_ms, n;
+        const uint64_t frame_ms_numerator   = 1000 * hm.fps_denominator;
+        const uint64_t frame_ms_denominator = hm.fps_numerator;
+        uint64_t total_htime, total_dtime;
+        uint32_t htime_f, dtime_f;
+        uint64_t carry = 0;
 
         // Stage 1.5b - Create start delays :
         uint32_t earliest = UINT32_MAX;
@@ -97,38 +99,46 @@ namespace maniaparser
             }
         }
         for ( uint8_t i = 0; i < 4; ++i ) {
-            dtime_f = timeline.at(i).at(0).first - earliest;
-            hm.start_delays[i] = dtime_f * frame_ms + ( dtime_f * remain_ms )/hm.fps;
+            total_dtime = ( timeline.at(i).at(0).first - earliest ) * frame_ms_numerator;
+            hm.start_delays[i] = total_dtime / frame_ms_denominator;
         }
 
-        // Stage 2 - Transform hold times and release times to ms using fps :
-        for ( uint8_t i = 0; i < 4; ++i )
-        {   // Reset carry for column, iterate to n-1 element:
-            n = timeline.at(i).size() - 1;
-            carry_ms = 0;
+        // Stage 2 - Transform hold times and delay times to ms using fps :
+        for ( size_t i = 0; i < 4; ++i )
+        {   // Tterate to n-1 element, reset carry for column:
+            size_t n = timeline.at(i).size() - 1;
+            carry    = 0;
 
-            for ( uint32_t j = 0; j < n; ++j )
+            for ( size_t j = 0; j < n; ++j )
             {   // Frame duration calculations :
-                htime_f = timeline.at(i).at(j).second - timeline.at(i).at(j).first;
-                dtime_f = timeline.at(i).at(j + 1).first
-                        - timeline.at(i).at(j).first
-                        - htime_f;
+                htime_f = timeline.at(i).at(j).second    - timeline.at(i).at(j).first;
+                dtime_f = timeline.at(i).at(j + 1).first - timeline.at(i).at(j).second;
 
                 // Hold time - frames to ms :
-                htime_ms = htime_f * frame_ms + ( htime_f * remain_ms + carry_ms )/hm.fps;
-                carry_ms = ( htime_f * remain_ms + carry_ms ) % hm.fps;
+                total_htime = htime_f * frame_ms_numerator + carry;
+                carry       = total_htime % frame_ms_denominator;
 
                 // Delay time - frames to ms :
-                dtime_ms = dtime_f * frame_ms + ( dtime_f * remain_ms + carry_ms )/hm.fps;
-                carry_ms = ( dtime_f * remain_ms + carry_ms ) % hm.fps;
+                total_dtime = dtime_f * frame_ms_numerator + carry;
+                carry       = total_dtime % frame_ms_denominator;
 
                 // Hold/delay time entry:
-                hm.hitmap[i].emplace_back( std::make_pair( htime_ms, dtime_ms ) );
+                hm.hitmap[i].emplace_back(
+                    std::make_pair(
+                        total_htime / frame_ms_denominator, 
+                        total_dtime / frame_ms_denominator
+                    )
+                );
             }
             // nth hold/delay time entry:
-            htime_f  = timeline.at(i).at(n).second - timeline.at(i).at(n).first;
-            htime_ms = htime_f * frame_ms + ( htime_f * remain_ms + carry_ms )/hm.fps;
-            hm.hitmap[i].emplace_back( std::make_pair( htime_ms, 0 ) );
+            htime_f     = timeline.at(i).back().second - timeline.at(i).back().first;
+            total_htime = htime_f * frame_ms_numerator + carry;
+            hm.hitmap[i].emplace_back(
+                std::make_pair(
+                    total_htime / frame_ms_denominator,
+                    0
+                )
+            );
         }
     }
 
@@ -162,7 +172,10 @@ namespace maniaparser
         std::stringstream header_stream( header );
         uint32_t vk1, vk2, vk3, vk4;
 
-        if ( !( header_stream >> hm.fps >> vk1 >> vk2 >> vk3 >> vk4 ) ) {
+        // Must be of format: "FPS_NUM FPS_DEN VK1 VK2 VK3 VK4"
+        if ( !( header_stream >> hm.fps_numerator >> hm.fps_denominator
+            >> vk1 >> vk2 >> vk3 >> vk4 ) )
+        {
             hm.err = "Header format invalid.";
             file.close();
             return hm;

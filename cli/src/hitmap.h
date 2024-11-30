@@ -23,7 +23,8 @@
 
 // HitMap struct type, mania file storage program type :: - -                          - -
 struct HitMap {
-    uint32_t                fps;
+    uint32_t                fps_numerator;
+    uint32_t                fps_denominator;
     std::string             err = "";
     std::filesystem::path   original_file;
     std::array<uint8_t,  4> virtual_keys;
