@@ -14,6 +14,9 @@ public:
     MainWindow( QWidget* = nullptr );
     ~MainWindow() = default;
 
+public slots:
+    void minimize( void );
+
 private:
     //
     QF*  make_main_widget();

@@ -8,10 +8,8 @@
 VideoPlayer::VideoPlayer( Utils* u, QW* p ) : utils( u ), QW{ p }
 {
     setFixedSize( 990, 564 );
-    audio_output = new QAudioOutput( this );
+    //audio_output = new QAudioOutput( this );
     media_player = new QMediaPlayer( this );
-    //video_widget = new QVideoWidget( this );
-    //video_widget->setFixedSize( 970, 546 );
 
     QGraphicsScene* scene = new QGraphicsScene( this );
     QGraphicsView*  view = new QGraphicsView( scene, this );
@@ -27,11 +25,10 @@ VideoPlayer::VideoPlayer( Utils* u, QW* p ) : utils( u ), QW{ p }
     video_item->setSize( QSizeF( 970, 546 ) );
     scene->addItem( video_item );
 
-
-    audio_output->setVolume( 0.5 );
+    //audio_output->setVolume( 0.5 );
 
     media_player->setVideoOutput( video_item );
-    media_player->setAudioOutput( audio_output );
+    //media_player->setAudioOutput( audio_output );
 
     QSL* layout = new QSL( this );
     layout->setStackingMode( QStackedLayout::StackAll );
@@ -46,7 +43,7 @@ VideoPlayer::VideoPlayer( Utils* u, QW* p ) : utils( u ), QW{ p }
     gradient->setStyleSheet(
         "background-color: transparent;"
     );
-    gradient->setPixmap( QPixmap( "res/gradient.png" ) );
+    gradient->setPixmap( QPixmap( "assets/misc/video-gradient.png" ) );
     QW*  gradient_qw = new QW();
     QVL* gradient_ql = new QVL( gradient_qw );
     gradient_ql->setContentsMargins( 0, 296, 0, 0 );
@@ -61,7 +58,40 @@ VideoPlayer::VideoPlayer( Utils* u, QW* p ) : utils( u ), QW{ p }
     bot_line_ql->setContentsMargins( 0, 539, 0, 0 );
     bot_line_ql->addWidget( bot_line );
 
+    //
+    QL* inactive_ql = new QL();
+    inactive_ql->setFixedSize( 970, 546 );
+    inactive_ql->setPixmap( QPixmap( "assets/misc/inactive.png" ) );
 
+    QOE* inactive_e = new QOE( inactive_ql );
+    inactive_e->setOpacity( 1 );
+    inactive_ql->setGraphicsEffect( inactive_e );
+    inactive_a = utils->make_animation(
+        1000, 1, 0, QEasingCurve::InOutCubic, "opacity", inactive_e, inactive_ql );
+
+    fade_timer = new QTimer( this );
+    fade_timer->setSingleShot( true );
+    connect( fade_timer, &QTimer::timeout, this, [this]()
+    {
+        active = false;
+        inactive_a->setStartValue( 0 );
+        inactive_a->setStartValue( 1 );
+        inactive_a->start();
+    } );
+
+    connect( inactive_a, &QAbstractAnimation::finished, this, [this]()
+    {
+        // Fade out animation :
+        if ( active ) { return; }
+
+        // Fade in animation :
+        if ( media_player->isPlaying() ) {
+            media_player->stop();
+        }
+        media_player->setSource( QUrl( ) );
+    } );
+
+    //
     QF* ks_notch = new QF();
     ks_notch->setFixedSize( 100, 10 );
     ks_notch->setStyleSheet(
@@ -73,45 +103,47 @@ VideoPlayer::VideoPlayer( Utils* u, QW* p ) : utils( u ), QW{ p }
     ks_notch_ql->setContentsMargins( 840, 539, 0, 0 );
     ks_notch_ql->addWidget( ks_notch );
 
+    // Front
     layout->addWidget( bot_line_qw  );
     layout->addWidget( ks_notch_qw  );
+    layout->addWidget( inactive_ql );
     layout->addWidget( gradient_qw );
     layout->addWidget( view );
+    // Back
 
-    // maybe: kps legend
-    // kps graph
-
-    // off image
-
-    // bottom line + key strokes
-
-    // key strokes circle frame
+    // key strokes
 
     // Connections :
     connect( media_player, &QMediaPlayer::mediaStatusChanged, this, &VideoPlayer::handle_media_status );
     connect( media_player, &QMediaPlayer::errorOccurred, this, &VideoPlayer::handle_error );
-
-    // VideoWidget startup render fix :
-    //video_widget->hide();
-
-    //QTimer::singleShot( 1000, this, [=]( void ){
-    //    video_widget->show();
-    //} );
 }
 
 //
 void VideoPlayer::play_video( CQS& video_path )
 {
+    active = true;
+    inactive_a->setStartValue( 1 );
+    inactive_a->setEndValue( 0 );
+    inactive_a->start();
+
     media_player->setSource( QUrl::fromLocalFile( video_path ) );
     media_player->play();
+
+    QTimer::singleShot( 100, this, [this](){
+        fade_timer->start( qMax( media_player->duration() - 1300, 1000 ) );
+    } );
 }
 
 //
 void VideoPlayer::stop_video( void )
 {
-    if ( !media_player->isPlaying() ) { return; }
-    media_player->stop();
-    media_player->setSource( QUrl( nullptr ) );
+    // Already fading out / stopping video :
+    if ( !active ) { return; }
+
+    active = false;
+    inactive_a->setStartValue( 0 );
+    inactive_a->setEndValue( 1 );
+    inactive_a->start();
 }
 
 void VideoPlayer::handle_media_status( QMediaPlayer::MediaStatus status ) {

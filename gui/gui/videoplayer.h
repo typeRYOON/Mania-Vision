@@ -5,6 +5,7 @@
 #include <QMediaPlayer>
 #include <QVideoWidget>
 #include <QAudioOutput>
+#include <QGraphicsVideoItem>
 
 class VideoPlayer : public QW {
     Q_OBJECT
@@ -18,9 +19,19 @@ public slots:
 
 private:
     Utils* utils;
+
+    //
     QAudioOutput* audio_output;
     QMediaPlayer* media_player;
     QVideoWidget* video_widget;
+
+    //
+    QTimer* fade_timer = nullptr;
+    QPA* inactive_a    = nullptr;
+    bool active        = false;
+
+
+
 
 private slots:
     void handle_media_status( QMediaPlayer::MediaStatus );

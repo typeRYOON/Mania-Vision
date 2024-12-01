@@ -24,6 +24,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(ManiaVision
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        "assets/program/icon.rc"
         utils/shorthand.h
         utils/utils.h utils/utils.cpp
         gui/titlebar.h gui/titlebar.cpp

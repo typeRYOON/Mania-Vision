@@ -5,6 +5,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 #include <QStackedLayout>
+#include <QPushButton>
 #include <QObject>
 #include <QLabel>
 
@@ -14,6 +15,7 @@ using QW = QWidget;
 using CQS = const QString;
 using QS  = QString;
 
+using QPB = QPushButton;
 using QF  = QFrame;
 using QL  = QLabel;
 

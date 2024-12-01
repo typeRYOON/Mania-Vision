@@ -14,6 +14,7 @@ MainWindow::MainWindow( QWidget* p ) : QMainWindow( p )
 
     resize( 1340, 894 );
     setFixedSize( size() );
+    setWindowIcon( QIcon( "assets/program/taskbar.png" ) );
     setWindowFlags( Qt::FramelessWindowHint );
     setAttribute( Qt::WA_TranslucentBackground );
 
@@ -24,6 +25,12 @@ MainWindow::MainWindow( QWidget* p ) : QMainWindow( p )
         show();
         window_fade_to( 1.0, 400 );
     } );
+}
+
+void MainWindow::minimize( void )
+{
+    window_fade_to( 0.0, 250 );
+    QTimer::singleShot( 500, this, &QW::showMinimized );
 }
 
 //
@@ -68,11 +75,23 @@ QF* MainWindow::make_main_widget()
     main_vl->addLayout( main_hl );
 
     // Make Connections :
-
-    QTimer::singleShot( 1100, [=]( void ) {
-        video_player->play_video( "E:\\pc\\downloads\\9aywvz.mov" );
+    connect( title_bar, &TitleBar::minimize_sig, this, &MainWindow::minimize );
+    connect( title_bar, &TitleBar::close_sig, this, [this]( void )
+    {
+        connect( window_fade_to( 0, 400 ), &QPA::finished, this, [this]( void ) {
+            this->close();
+        } );
     } );
 
+    QTimer::singleShot( 4000, this, [=]( void ) {
+        video_player->play_video(
+            "E:\\pc\\videos\\opopppp\\ためし.mp4"
+        );
+    } );
+
+    QTimer::singleShot( 7000, this, [=]( void ) {
+        video_player->stop_video();
+    } );
     return main_widget;
 }
 
@@ -123,6 +142,7 @@ void MainWindow::keyPressEvent( QKeyEvent* e )
             this->close();
         } );
     }
+    else if ( e->key() == Qt::Key_3 ) { minimize(); }
     else if ( e->modifiers() == Qt::AltModifier && e->key() == Qt::Key_T )
     {
         is_force_focused = !is_force_focused;

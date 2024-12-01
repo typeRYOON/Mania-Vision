@@ -4,7 +4,7 @@
 Utils::Utils( void )
 {
     const qint32 font_ID = QFontDatabase::addApplicationFont(
-        "res/Hiragino Maru Gothic ProN W4.otf"
+        "assets/program/Hiragino Maru Gothic ProN W4.otf"
     );
     if ( font_ID == -1 ) { return; }
     font_family = QFontDatabase::applicationFontFamilies( font_ID ).at(0);
@@ -26,7 +26,7 @@ QDS* Utils::make_dropshadow( const QColor& color, QObject* p, const quint8& r )
 }
 
 //
-QF* Utils::makeVLine( const QSize& size, const QColor& color, QObject* p )
+QF* Utils::make_vline( const QSize& size, const QColor& color, QObject* p )
 {
     QF* ret = new QF();
     ret->setFixedSize( size );

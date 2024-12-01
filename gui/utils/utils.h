@@ -9,7 +9,7 @@ public:
     explicit Utils( void );
     [[nodiscard]] QFont get_font( const quint8& );
     [[nodiscard]] QDS*  make_dropshadow( const QColor&, QObject*, const quint8& = 10 );
-    [[nodiscard]] QF*   makeVLine( const QSize&, const QColor&, QObject* );
+    [[nodiscard]] QF*   make_vline( const QSize&, const QColor&, QObject* );
     [[nodiscard]] QPA*  make_animation(
         const quint32&,
         const QVariant&,
