@@ -172,10 +172,12 @@ TitleBar::TitleBar( Utils* u, QWidget* p ) : utils( u ), QFrame{ p }
     layout_hl->addSpacing( 16 );
     layout_hl->addWidget( close_pb );
 
-    connect( minimize_pb, &QPB::clicked, this, [this]( void ){
+    connect( minimize_pb, &QPB::clicked, this, [this]( void ) {
+        if ( sound_on ) { se->play(); }
         emit minimize_sig();
     } );
-    connect( close_pb, &QPB::clicked, this, [this]( void ){
+    connect( close_pb, &QPB::clicked, this, [this]( void ) {
+        if ( sound_on ) { se->play(); }
         emit close_sig();
     } );
 

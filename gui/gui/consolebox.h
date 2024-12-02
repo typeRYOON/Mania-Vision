@@ -10,8 +10,18 @@ class ConsoleBox : public QF {
 public:
     explicit ConsoleBox( Utils* u, QW* = nullptr );
 
+public slots:
+    void add_log( const quint32&, CQS& );
+
 private:
     Utils* utils;
+
+    //
+    QList<QPair<QL*, QL*>> log_labels;
+
+    // funcs :
+    QW* make_history_log( void );
+    QW* make_page_sl( void );
 
 signals:
 };

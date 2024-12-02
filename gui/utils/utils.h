@@ -1,7 +1,7 @@
 /* utils.h */
 #ifndef UTILS_H
 #define UTILS_H
-#include "shorthand.h"
+#include "shorthand.hpp"
 #include <QFontDatabase>
 
 class Utils {

@@ -20,6 +20,8 @@ MainWindow::MainWindow( QWidget* p ) : QMainWindow( p )
 
     setCentralWidget( make_main_widget() );
 
+
+
     QTimer::singleShot( 500, this, [this]()
     {
         show();
@@ -83,14 +85,26 @@ QF* MainWindow::make_main_widget()
         } );
     } );
 
+    connect( this, &MainWindow::add_log, console_box, &ConsoleBox::add_log );
+
     QTimer::singleShot( 4000, this, [=]( void ) {
         video_player->play_video(
-            "E:\\pc\\videos\\opopppp\\ためし.mp4"
+            "E:\\pc\\videos\\opopppp\\5b9dd5b1_あやせソープ.mp4"
         );
     } );
 
     QTimer::singleShot( 7000, this, [=]( void ) {
         video_player->stop_video();
+    } );
+
+    QTimer::singleShot( 3000, this, [=]( void ) {
+        emit add_log( 100, "1" );
+    } );
+    QTimer::singleShot( 3200, this, [=]( void ) {
+        emit add_log( 200, "2" );
+    } );
+    QTimer::singleShot( 3700, this, [=]( void ) {
+        emit add_log( 0xFF, "3" );
     } );
     return main_widget;
 }

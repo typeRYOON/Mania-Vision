@@ -40,5 +40,9 @@ protected:
     void keyPressEvent( QKeyEvent* )       override;
     void changeEvent( QEvent* )            override;
 
+signals:
+    void add_log( const quint8&, CQS& );
+
+
 };
 #endif // MAINWINDOW_H
