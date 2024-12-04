@@ -10,11 +10,16 @@ class TitleBar : public QF {
 public:
     explicit TitleBar( Utils*, QWidget* = nullptr );
 
+public slots:
+    void video_started( void );
+    void video_ended( void );
+
 private:
     Utils*  utils;
 
     // Timing
     quint16 prog_elapsed = 0;
+    quint16 run_elapsed  = 0;
     QTimer* prog_timer;
     QTimer* run_timer;
     QL*     prog_time;
@@ -43,6 +48,7 @@ signals:
     void opt_change( const quint8& );
     void minimize_sig( void );
     void close_sig( void );
+    void add_log( const quint16&, CQS& );
 };
 
 #endif // TITLEBAR_H :: - -                                                            - -

@@ -41,7 +41,7 @@ protected:
     void changeEvent( QEvent* )            override;
 
 signals:
-    void add_log( const quint8&, CQS& );
+    void add_log( const quint16&, CQS& );
 
 
 };

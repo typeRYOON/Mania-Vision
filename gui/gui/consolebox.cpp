@@ -46,7 +46,7 @@ ConsoleBox::ConsoleBox( Utils* u, QW* p ) : utils( u ), QF{ p }
 }
 
 //
-void ConsoleBox::add_log( const quint32& sec, CQS& text )
+void ConsoleBox::add_log( const quint16& sec, CQS& text )
 {
     for ( quint8 i = 0; i < 3; ++i )
     {
@@ -102,7 +102,6 @@ QW* ConsoleBox::make_history_log( void )
     QF*  qf;
     for ( quint8 i = 0; i < 4; ++i )
     {
-
         if ( i & 0x1 ) { qf = make_qf( " #logqf { background-color: transparent; }" );       }
         else { qf = make_qf( "#logqf { border-radius: 8px; background-color: #0b0b0b; }" ); }
 

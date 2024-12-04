@@ -35,7 +35,8 @@ TitleBar::TitleBar( Utils* u, QWidget* p ) : utils( u ), QFrame{ p }
         "00:00", "color: #FFFFFF", QColor( 0xFFFFFF ), 11, 13, this );
 
     prog_timer = new QTimer( this );
-    connect( prog_timer, &QTimer::timeout, this, [&](){
+    connect( prog_timer, &QTimer::timeout, this, [&]( void )
+    {
         prog_time->setText(
             QString( "%1:%2" )
                 .arg( ++prog_elapsed / 60, 2, 10, QChar( '0' ) )
@@ -44,10 +45,21 @@ TitleBar::TitleBar( Utils* u, QWidget* p ) : utils( u ), QFrame{ p }
     } );
     prog_timer->start( 60000 );
 
+    run_timer = new QTimer( this );
+    connect( run_timer, &QTimer::timeout, this, [&]( void )
+    {
+        run_time->setText(
+            QString( "%1:%2" )
+                .arg( ++run_elapsed / 60, 2, 10, QChar( '0' ) )
+                .arg(   run_elapsed % 60, 2, 10, QChar( '0' ) )
+        );
+    } );
+
     QL* run_text = make_time_ql(
         "Running: ", "color: #FF5353", QColor( 0xFF5353 ), 9, 16, this );
-    run_time     =
-        make_time_ql( "00:00"  ,   "color: #FF5353", QColor( 0xFF5353 ), 9, 16, this );
+    run_time     = make_time_ql(
+        "00:00",     "color: #FF5353", QColor( 0xFF5353 ), 9, 16, this );
+
 
     // Layout construction :
     QW* qsl_qw = new QW();
@@ -149,7 +161,7 @@ TitleBar::TitleBar( Utils* u, QWidget* p ) : utils( u ), QFrame{ p }
     title_ql->setFont( utils->get_font( 12 ) );
     title_ql->setStyleSheet( "color: #FFFFFF" );
     title_ql->setGraphicsEffect(
-        utils->make_dropshadow( QColor( 0xFFFFFF ), title_ql ) );
+        utils->make_dropshadow( QColor( 0xAFAFAF ), title_ql ) );
     layout_hl->addWidget( title_ql );
 
     QL* icon_ql = new QL();
@@ -181,6 +193,18 @@ TitleBar::TitleBar( Utils* u, QWidget* p ) : utils( u ), QFrame{ p }
         emit close_sig();
     } );
 
+}
+
+//
+void TitleBar::video_started( void ) { run_timer->start( 1000 ); }
+
+//
+void TitleBar::video_ended( void )
+{
+    run_timer->stop();
+    emit add_log( run_elapsed, "Configuration Done" );
+    run_elapsed = 0;
+    run_time->setText( "00:00" );
 }
 
 QF* TitleBar::make_slide_box( void )

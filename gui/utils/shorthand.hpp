@@ -27,4 +27,24 @@ using QDS = QGraphicsDropShadowEffect;
 using QOE = QGraphicsOpacityEffect;
 using QPA = QPropertyAnimation;
 
+//
+typedef struct ManiaEntry {
+    QList<quint8> kps_graph;
+    QS            file_name;
+    QS            fps;
+    QS            id;
+
+    //
+    friend QDataStream& operator<<( QDataStream& out, const ManiaEntry& e ) {
+        out << e.kps_graph << e.file_name << e.fps << e.id;
+        return out;
+    }
+    //
+    friend QDataStream& operator>>( QDataStream& in, ManiaEntry& e ) {
+        in  >> e.kps_graph >> e.file_name >> e.fps >> e.id;
+        return in;
+    }
+} ManiaEntry;
+using ManiaEntryPtr = std::shared_ptr<ManiaEntry>;
+
 #endif // SHORTHAND_H 

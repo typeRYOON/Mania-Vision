@@ -31,6 +31,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         gui/videoplayer.h gui/videoplayer.cpp
         gui/consolebox.h gui/consolebox.cpp
         gui/selectbox.h gui/selectbox.cpp
+        utils/processhandler.h utils/processhandler.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET ManiaVision APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

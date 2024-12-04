@@ -11,7 +11,7 @@ public:
     explicit ConsoleBox( Utils* u, QW* = nullptr );
 
 public slots:
-    void add_log( const quint32&, CQS& );
+    void add_log( const quint16&, CQS& );
 
 private:
     Utils* utils;

@@ -30,14 +30,13 @@ private:
     QPA* inactive_a    = nullptr;
     bool active        = false;
 
-
-
-
 private slots:
     void handle_media_status( QMediaPlayer::MediaStatus );
     void handle_error( QMediaPlayer::Error );
 
 signals:
+    void stop_sig( void );
+    void start_sig( void );
 };
 
 #endif // VIDEOPLAYER_H

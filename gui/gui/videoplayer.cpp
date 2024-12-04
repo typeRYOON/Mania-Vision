@@ -75,7 +75,7 @@ VideoPlayer::VideoPlayer( Utils* u, QW* p ) : utils( u ), QW{ p }
     {
         active = false;
         inactive_a->setStartValue( 0 );
-        inactive_a->setStartValue( 1 );
+        inactive_a->setEndValue( 1 );
         inactive_a->start();
     } );
 
@@ -83,6 +83,8 @@ VideoPlayer::VideoPlayer( Utils* u, QW* p ) : utils( u ), QW{ p }
     {
         // Fade out animation :
         if ( active ) { return; }
+        //
+        emit stop_sig();
 
         // Fade in animation :
         if ( media_player->isPlaying() ) {
@@ -128,9 +130,10 @@ void VideoPlayer::play_video( CQS& video_path )
 
     media_player->setSource( QUrl::fromLocalFile( video_path ) );
     media_player->play();
+    emit start_sig();
 
     QTimer::singleShot( 100, this, [this](){
-        fade_timer->start( qMax( media_player->duration() - 1300, 1000 ) );
+        fade_timer->start( qMax( media_player->duration() - 2000, 100 ) );
     } );
 }
 
