@@ -3,7 +3,7 @@
   <a href="https://github.com/typeRYOON/Mania-Vision/"><img src="https://raw.githubusercontent.com/typeRYOON/Mania-Vision/master/docs/img/banner.png" alt="Preview"></a>
 </h1>
 
-<h4 align="center">VSRG Handcam to Press File Format!</h4>
+<h4 align="center">Press Detection for Rhythm Games!</h4>
 
 <p align="center">
     <a href="https://github.com/typeRYOON/Mania-Vision/commits/main">
