@@ -2,17 +2,21 @@
 ''' --------------------------------------------------------------------------------------
  >> University of Illinois at Chicago - CS 415, Fall 2024
  >> --------------------------------------------------------------------------------------
- >> File   :: mania-vision-cli.py
- >> Course :: CS 415 (42844), FA24
- >> Author :: Ryan Magdaleno (rmagd2)
- >> System :: Windows 10 w/ Python 3.11.3
+ >> File    :: mania-vision-cli.py
+ >> Course  :: CS 415 (42844), FA24
+ >> Authors :: Ryan Magdaleno
+ >>         :: Aaron Willming
+ >>         :: Semih Kesler
+ >>         :: Jonathan Hung
+ >> System  :: Windows 10 w/ Python 3.11.3
  - -            References            - -
  >> https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker
  - -                                  - -
  >> File overview ::
  >> This script takes in a video argument, within that video, a person is playing a
  >> rhythm game on their keyboard. This video will convert the middle + index fingertip
- >> coordinates on both hands to bit encodings for the player presses.
+ >> coordinates on both hands to bit encodings for the player presses. Make sure to
+ >> install in a venv or global space the requirements.txt libraries before using.
  - -                                  - -
  >> Usage ::
  >> "py mania-vision-cli.py [video-in-path] [encoding-out-path]"
